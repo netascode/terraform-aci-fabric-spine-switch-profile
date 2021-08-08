@@ -14,35 +14,108 @@ terraform {
 module "main" {
   source = "../.."
 
-  name        = "ABC"
-  alias       = "ALIAS"
-  description = "DESCR"
+  name               = "SPINE1001"
+  interface_profiles = ["PROF1"]
+  selectors = [{
+    name   = "SEL1"
+    policy = "POL1"
+    node_blocks = [{
+      name = "BLOCK1"
+      from = 1001
+      to   = 1001
+    }]
+  }]
 }
 
-data "aci_rest" "fvTenant" {
-  dn = "uni/tn-ABC"
+data "aci_rest" "fabricSpineP" {
+  dn = "uni/fabric/spprof-${module.main.name}"
 
   depends_on = [module.main]
 }
 
-resource "test_assertions" "fvTenant" {
-  component = "fvTenant"
+resource "test_assertions" "fabricSpineP" {
+  component = "fabricSpineP"
 
   equal "name" {
     description = "name"
-    got         = data.aci_rest.fvTenant.content.name
-    want        = "ABC"
+    got         = data.aci_rest.fabricSpineP.content.name
+    want        = module.main.name
+  }
+}
+
+data "aci_rest" "fabricSpineS" {
+  dn = "${data.aci_rest.fabricSpineP.id}/spines-SEL1-typ-range"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "fabricSpineS" {
+  component = "fabricSpineS"
+
+  equal "name" {
+    description = "name"
+    got         = data.aci_rest.fabricSpineS.content.name
+    want        = "SEL1"
+  }
+}
+
+data "aci_rest" "fabricRsSpNodePGrp" {
+  dn = "${data.aci_rest.fabricSpineS.id}/rsspNodePGrp"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "fabricRsSpNodePGrp" {
+  component = "fabricRsSpNodePGrp"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest.fabricRsSpNodePGrp.content.tDn
+    want        = "uni/fabric/funcprof/spnodepgrp-POL1"
+  }
+}
+
+data "aci_rest" "fabricNodeBlk" {
+  dn = "${data.aci_rest.fabricSpineS.id}/nodeblk-BLOCK1"
+
+  depends_on = [module.main]
+}
+
+
+resource "test_assertions" "fabricNodeBlk" {
+  component = "fabricNodeBlk"
+
+  equal "name" {
+    description = "name"
+    got         = data.aci_rest.fabricNodeBlk.content.name
+    want        = "BLOCK1"
   }
 
-  equal "nameAlias" {
-    description = "nameAlias"
-    got         = data.aci_rest.fvTenant.content.nameAlias
-    want        = "ALIAS"
+  equal "from_" {
+    description = "from_"
+    got         = data.aci_rest.fabricNodeBlk.content.from_
+    want        = "1001"
   }
 
-  equal "descr" {
-    description = "descr"
-    got         = data.aci_rest.fvTenant.content.descr
-    want        = "DESCR"
+  equal "to_" {
+    description = "to_"
+    got         = data.aci_rest.fabricNodeBlk.content.to_
+    want        = "1001"
+  }
+}
+
+data "aci_rest" "fabricRsSpPortP" {
+  dn = "${data.aci_rest.fabricSpineP.id}/rsspPortP-[uni/fabric/spportp-PROF1]"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "fabricRsSpPortP" {
+  component = "fabricRsSpPortP"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest.fabricRsSpPortP.content.tDn
+    want        = "uni/fabric/spportp-PROF1"
   }
 }
