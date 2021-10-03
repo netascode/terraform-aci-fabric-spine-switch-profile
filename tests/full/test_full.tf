@@ -17,8 +17,8 @@ module "main" {
   name               = "SPINE1001"
   interface_profiles = ["PROF1"]
   selectors = [{
-    name   = "SEL1"
-    policy = "POL1"
+    name         = "SEL1"
+    policy_group = "POL1"
     node_blocks = [{
       name = "BLOCK1"
       from = 1001

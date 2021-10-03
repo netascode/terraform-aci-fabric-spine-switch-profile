@@ -12,13 +12,14 @@ Location in GUI:
 
 ```hcl
 module "aci_fabric_spine_switch_profile" {
-  source = "netascode/fabric-spine-switch-profile/aci"
+  source  = "netascode/fabric-spine-switch-profile/aci"
+  version = ">= 0.0.1"
 
   name               = "SPINE1001"
   interface_profiles = ["PROF1"]
   selectors = [{
-    name   = "SEL1"
-    policy = "POL1"
+    name         = "SEL1"
+    policy_group = "POL1"
     node_blocks = [{
       name = "BLOCK1"
       from = 1001
@@ -48,7 +49,7 @@ module "aci_fabric_spine_switch_profile" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_name"></a> [name](#input\_name) | Spine switch profile name. | `string` | n/a | yes |
 | <a name="input_interface_profiles"></a> [interface\_profiles](#input\_interface\_profiles) | List of interface profile names. | `list(string)` | `[]` | no |
-| <a name="input_selectors"></a> [selectors](#input\_selectors) | List of selectors. Allowed values `from`: 1-4000. Allowed values `to`: 1-4000. | <pre>list(object({<br>    name   = string<br>    policy = optional(string)<br>    node_blocks = list(object({<br>      name = string<br>      from = number<br>      to   = optional(number)<br>    }))<br>  }))</pre> | `[]` | no |
+| <a name="input_selectors"></a> [selectors](#input\_selectors) | List of selectors. Allowed values `from`: 1-4000. Allowed values `to`: 1-4000. | <pre>list(object({<br>    name         = string<br>    policy_group = optional(string)<br>    node_blocks = list(object({<br>      name = string<br>      from = number<br>      to   = optional(number)<br>    }))<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 
