@@ -15,7 +15,7 @@ locals {
   ])
 }
 
-resource "aci_rest" "fabricSpineP" {
+resource "aci_rest_managed" "fabricSpineP" {
   dn         = "uni/fabric/spprof-${var.name}"
   class_name = "fabricSpineP"
   content = {
@@ -23,9 +23,9 @@ resource "aci_rest" "fabricSpineP" {
   }
 }
 
-resource "aci_rest" "fabricSpineS" {
+resource "aci_rest_managed" "fabricSpineS" {
   for_each   = { for selector in var.selectors : selector.name => selector }
-  dn         = "${aci_rest.fabricSpineP.dn}/spines-${each.value.name}-typ-range"
+  dn         = "${aci_rest_managed.fabricSpineP.dn}/spines-${each.value.name}-typ-range"
   class_name = "fabricSpineS"
   content = {
     name = each.value.name
@@ -33,18 +33,18 @@ resource "aci_rest" "fabricSpineS" {
   }
 }
 
-resource "aci_rest" "fabricRsSpNodePGrp" {
+resource "aci_rest_managed" "fabricRsSpNodePGrp" {
   for_each   = { for selector in var.selectors : selector.name => selector if selector.policy_group != null }
-  dn         = "${aci_rest.fabricSpineS[each.value.name].dn}/rsspNodePGrp"
+  dn         = "${aci_rest_managed.fabricSpineS[each.value.name].dn}/rsspNodePGrp"
   class_name = "fabricRsSpNodePGrp"
   content = {
     tDn = "uni/fabric/funcprof/spnodepgrp-${each.value.policy_group}"
   }
 }
 
-resource "aci_rest" "fabricNodeBlk" {
+resource "aci_rest_managed" "fabricNodeBlk" {
   for_each   = { for item in local.node_blocks : item.key => item.value }
-  dn         = "${aci_rest.fabricSpineP.dn}/${each.value.selector_rn}/nodeblk-${each.value.name}"
+  dn         = "${aci_rest_managed.fabricSpineP.dn}/${each.value.selector_rn}/nodeblk-${each.value.name}"
   class_name = "fabricNodeBlk"
   content = {
     name  = each.value.name
@@ -52,13 +52,13 @@ resource "aci_rest" "fabricNodeBlk" {
     to_   = each.value.to
   }
   depends_on = [
-    aci_rest.fabricSpineS
+    aci_rest_managed.fabricSpineS
   ]
 }
 
-resource "aci_rest" "fabricRsSpPortP" {
+resource "aci_rest_managed" "fabricRsSpPortP" {
   for_each   = toset(local.spine_interface_profiles)
-  dn         = "${aci_rest.fabricSpineP.dn}/rsspPortP-[${each.value}]"
+  dn         = "${aci_rest_managed.fabricSpineP.dn}/rsspPortP-[${each.value}]"
   class_name = "fabricRsSpPortP"
   content = {
     tDn = each.value
