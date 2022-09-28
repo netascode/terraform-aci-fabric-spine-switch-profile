@@ -13,7 +13,7 @@ Location in GUI:
 ```hcl
 module "aci_fabric_spine_switch_profile" {
   source  = "netascode/fabric-spine-switch-profile/aci"
-  version = ">= 0.1.0"
+  version = ">= 0.2.0"
 
   name               = "SPINE1001"
   interface_profiles = ["PROF1"]
@@ -33,7 +33,7 @@ module "aci_fabric_spine_switch_profile" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.0.0 |
 
 ## Providers

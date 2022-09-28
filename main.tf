@@ -8,7 +8,7 @@ locals {
           selector_rn = "spines-${selector.name}-typ-range"
           name        = node_block.name
           from        = node_block.from
-          to          = lookup(node_block, "to", node_block.from)
+          to          = node_block.to != null ? node_block.to : node_block.from
         }
       }
     ]
